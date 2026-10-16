@@ -1,0 +1,94 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let pods = KubePodInventory | where Namespace == \"default\" and Name startswith \"web-\" | summarize by PodUid, PodName = Name;\r\nPerf\r\n| where TimeGenerated > ago(6h) and ObjectName == \"K8SContainer\" and CounterName == \"cpuUsageNanoCores\"\r\n| extend parts = split(InstanceName, \"/\")\r\n| extend PodUid = tostring(parts[array_length(parts) - 2])\r\n| join kind=inner pods on PodUid\r\n| summarize CPU_pct_of_limit = avg(CounterValue) / 2000000 by bin(TimeGenerated, 1m), PodName\r\n| render timechart",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 21600000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "/subscriptions/b39e6f58-67f4-4df9-940d-7968644cca50/resourceGroups/lab2-rg/providers/Microsoft.OperationalInsights/workspaces/lab2-law-ea"
+        ]
+      },
+      "name": "query - 0"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let pods = KubePodInventory | where Namespace == \"default\" and Name startswith \"web-\" | summarize by PodUid, PodName = Name;\r\nPerf\r\n| where TimeGenerated > ago(6h) and ObjectName == \"K8SContainer\" and CounterName == \"memoryWorkingSetBytes\"\r\n| extend parts = split(InstanceName, \"/\")\r\n| extend PodUid = tostring(parts[array_length(parts) - 2])\r\n| join kind=inner pods on PodUid\r\n| summarize Memory_MiB = avg(CounterValue) / 1048576 by bin(TimeGenerated, 1m), PodName\r\n| render timechart",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 21600000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "/subscriptions/b39e6f58-67f4-4df9-940d-7968644cca50/resourceGroups/lab2-rg/providers/Microsoft.OperationalInsights/workspaces/lab2-law-ea"
+        ]
+      },
+      "name": "query - 1"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AppRequests\r\n| where TimeGenerated > ago(6h)\r\n| summarize Requests = sum(ItemCount) by bin(TimeGenerated, 1m)\r\n| render columnchart",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 21600000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "/subscriptions/b39e6f58-67f4-4df9-940d-7968644cca50/resourceGroups/lab2-rg/providers/Microsoft.OperationalInsights/workspaces/lab2-law-ea"
+        ]
+      },
+      "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AppRequests\r\n| where TimeGenerated > ago(6h)\r\n| summarize P95_ms = percentile(DurationMs, 95) by bin(TimeGenerated, 1m)\r\n| render timechart",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 21600000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "/subscriptions/b39e6f58-67f4-4df9-940d-7968644cca50/resourceGroups/lab2-rg/providers/Microsoft.OperationalInsights/workspaces/lab2-law-ea"
+        ]
+      },
+      "name": "query - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "KubePodInventory\r\n| where TimeGenerated > ago(6h) and Namespace == \"default\" and Name startswith \"web-\" and PodStatus == \"Running\"\r\n| summarize Replicas = dcount(PodUid) by bin(TimeGenerated, 1m)\r\n| render timechart",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 21600000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "/subscriptions/b39e6f58-67f4-4df9-940d-7968644cca50/resourceGroups/lab2-rg/providers/Microsoft.OperationalInsights/workspaces/lab2-law-ea"
+        ]
+      },
+      "name": "query - 4"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
