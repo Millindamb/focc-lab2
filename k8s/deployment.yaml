@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: web }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: web } }
+  template:
+    metadata: { labels: { app: web } }
+    spec:
+      containers:
+        - name: web
+          image: lab2acr28008.azurecr.io/lab2-web:v2
+          ports: [{ containerPort: 3000 }]
+          env:
+            - { name: MONGO_URL, value: "mongodb://mongo:27017/lab2" }
+            - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: appi, key: conn } }
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 200m, memory: 256Mi }
+          readinessProbe:
+            httpGet: { path: /readyz, port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: 3000 }
+            initialDelaySeconds: 10
+            periodSeconds: 10

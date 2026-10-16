@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [{
+    "type": "Microsoft.Insights/scheduledQueryRules",
+    "apiVersion": "2022-06-15",
+    "name": "lab2-high-cpu",
+    "location": "eastasia",
+    "properties": {
+      "displayName": "lab2-high-cpu",
+      "description": "web CPU above 75% of limit for 2+ minutes",
+      "severity": 2,
+      "enabled": true,
+      "evaluationFrequency": "PT1M",
+      "windowSize": "PT5M",
+      "scopes": ["/subscriptions/b39e6f58-67f4-4df9-940d-7968644cca50/resourceGroups/lab2-rg/providers/Microsoft.OperationalInsights/workspaces/lab2-law-ea"],
+      "criteria": { "allOf": [{
+        "query": "Perf | where ObjectName == 'K8SContainer' and CounterName == 'cpuUsageNanoCores' and InstanceName endswith '/web' | summarize CpuPct = avg(CounterValue) / 2000000 by bin(TimeGenerated, 1m) | where CpuPct > 75",
+        "timeAggregation": "Count",
+        "operator": "GreaterThan",
+        "threshold": 1,
+        "failingPeriods": { "numberOfEvaluationPeriods": 1, "minFailingPeriodsToAlert": 1 }
+      }]},
+      "actions": { "actionGroups": ["/subscriptions/B39E6F58-67F4-4DF9-940D-7968644CCA50/resourceGroups/lab2-rg/providers/microsoft.insights/actionGroups/lab2-ag"] }
+    }
+  }]
+}
